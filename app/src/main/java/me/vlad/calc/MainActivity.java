@@ -15,7 +15,7 @@ import net.objecthunter.exp4j.ExpressionBuilder;
 public class MainActivity extends AppCompatActivity {
 
     TextView input, equal;
-    Boolean lastNum, error, lastDot, firstZero;
+    Boolean lastNum, error, lastDot, firstZero, lastRoot;
     Expression expression;
 
     @Override
@@ -31,6 +31,7 @@ public class MainActivity extends AppCompatActivity {
         error = false;
         lastDot = false;
         firstZero = true;
+        lastRoot = false;
     }
 
     //Нажатие на кнопку "="
@@ -86,13 +87,15 @@ public class MainActivity extends AppCompatActivity {
             firstZero = false;
         }
         if (error){
-            input.setText("Ошибка");
+            //equal.setText("=Ошибка");
             error = false;
+            input.setText("0");
         }else {
             Button btn = (Button)view;
             input.append(btn.getText().toString());
         }
         lastNum = true;
+        lastRoot = false;
         onEqual();
     }
 
@@ -115,7 +118,7 @@ public class MainActivity extends AppCompatActivity {
     //Нажатие на кнопку оператора "√", "÷", "×", "-", "+"
     public void onOperatorClick(View view) {
 
-        if (!error){
+        if (!error && !lastRoot){
             if (firstZero){
                 input.setText("");
                 firstZero = false;
@@ -124,6 +127,21 @@ public class MainActivity extends AppCompatActivity {
             input.append(btn.getText().toString());
             lastDot = false;
             lastNum = false;
+            onEqual();
+        }
+    }
+    public void onRootClick(View view) {
+
+        if (!error && !lastRoot){
+            if (firstZero){
+                input.setText("");
+                firstZero = false;
+            }
+            Button btn = (Button)view;
+            input.append(btn.getText().toString());
+            lastDot = false;
+            lastNum = false;
+            lastRoot = true;
             onEqual();
         }
     }
@@ -164,10 +182,23 @@ public class MainActivity extends AppCompatActivity {
     public void onEqual() {
 
         if (lastNum && !error){
-            String text = input.getText().toString().replace("√", "sqrt");
-            text = input.getText().toString().replace("÷", "/");
-            text = input.getText().toString().replace("×", "*");
-            text = input.getText().toString().replace("÷", "/");
+            String text = input.getText().toString();
+            if (text.contains("√")) {
+                text = input.getText().toString().replace("√", "sqrt");
+            }
+            if (text.contains("√-")) {
+                text = input.getText().toString().replaceAll("√-", "sqrt");
+            }
+            if (text.contains("×")) {
+                text = input.getText().toString().replace("×", "*");
+            }
+            if (text.contains("÷")) {
+                text = input.getText().toString().replace("÷", "/");
+            }
+
+            //text = text.replaceAll("÷", "/");// input.getText().toString().replace("÷", "/");
+            //text = input.getText().toString().replace("×", "*");
+            //text = input.getText().toString().replace("√", "sqrt");
             expression = new ExpressionBuilder(text).build();
             try {
                 Double result = expression.evaluate();
@@ -175,7 +206,7 @@ public class MainActivity extends AppCompatActivity {
                 equal.setText("=" + result);
             }catch (ArithmeticException ae){
                 Log.e("evaluate error", ae.toString());
-                equal.setText("Ошибка");
+                equal.setText("=Ошибка");
                 error = true;
                 lastNum = false;
             }

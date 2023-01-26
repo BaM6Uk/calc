@@ -82,7 +82,7 @@
                 style="@style/numbtn"
                 android:text="√"
                 android:textColor="#ff9900"
-                android:onClick="onOperatorClick"/>
+                android:onClick="onRootClick"/>
             <Button
                 android:id="@+id/btndiv"
                 style="@style/numbtn"
